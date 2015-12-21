@@ -1,0 +1,145 @@
+package com.company;
+
+import org.openqa.selenium.*;
+import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
+
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+
+
+public class SimpleTester {
+    private WebDriver driver = new FirefoxDriver();
+
+    class MyException extends Exception {
+        public MyException(String message) {
+            super(message);
+        }
+    }
+
+    public boolean checkByClassname(String classname) {
+        List<WebElement> elements = driver.findElements(By.className(classname));
+        return elements.size() != 0;
+    }
+
+    public boolean checkById(String id) {
+        List<WebElement> elements = driver.findElements(By.name(id));
+        return elements.size() != 0;
+    }
+
+    public boolean checkBySelector(String css) {
+        List<WebElement> elements = driver.findElements(By.cssSelector(css));
+        return elements.size() != 0;
+    }
+
+    /*
+    кликает элеменет с индексом (N-num)
+     */
+    public void doClick(String classname, int num) {
+        driver.manage().timeouts().implicitlyWait(2, TimeUnit.SECONDS);
+        List<WebElement> elements = driver.findElements(By.className(classname));
+        if (elements.size() != 0)
+            elements.get(elements.size() - num).click();
+    }
+
+    public String logIn(String link, String login, String password) throws MyException {
+        driver.get(link);
+        if (!checkById("password")) {
+            System.out.println("Error: " + link + " is unavailable");
+            driver.quit();
+            System.exit(0);
+        }
+        WebElement user = driver.findElement(By.name("login"));
+        WebElement pass = driver.findElement(By.name("password"));
+        user.sendKeys(login);
+        pass.sendKeys(password);
+        try {
+            pass.submit();
+        } catch (WebDriverException e) {
+            System.out.println(e.getMessage());
+        }
+        if (checkById("password")) {
+            throw new MyException("Error: Wrong login/password");
+        }
+        return link;
+    }
+
+    public void openTree() throws MyException {
+        if (!checkByClassname("GO5BKVTBLLD-su-ivt-helios-web-ui-widgets-tree-customTree-BaseTreeResources-Style-arrow")) {
+            throw new MyException("Error: Tree did not deploy");
+        }
+        WebElement element = driver.findElement(By.className("GO5BKVTBLLD-su-ivt-helios-web-ui-widgets-tree-customTree-BaseTreeResources-Style-arrow"));
+        (new WebDriverWait(driver, 10))
+                .until(ExpectedConditions.visibilityOf(element));
+        element.click();
+    }
+
+    public void goTo(String link) {
+        driver.manage().timeouts().implicitlyWait(2, TimeUnit.SECONDS);
+        driver.get(link);
+    }
+
+    public void wait(int millis) {
+        try {
+            Thread.sleep(millis);
+        } catch (InterruptedException e) {
+            System.out.println("Error: " + e.getMessage());
+        }
+    }
+
+
+    public static void main(String[] args) {
+//        args = new String[]{"http://rc.helios2.ivt.lan/", "kozub_an", "An71b3J;"};
+        if (args.length != 3) {
+            System.out.println("Error: It must be 3 params");
+            System.exit(0);
+        }
+        String link = args[0];
+        String login = args[1];
+        String password = args[2];
+
+        SimpleTester a = new SimpleTester();
+        a.wait(2000);
+        try {
+            a.logIn(link, login, password);
+        } catch (MyException e) {
+            System.out.println(e.getMessage());
+            a.driver.quit();
+            System.exit(0);
+            return;
+        }
+        a.wait(8000);
+        try {
+            a.openTree();
+        } catch (MyException e) {
+            System.out.println(e.getMessage());
+            a.driver.quit();
+            System.exit(0);
+        }
+        /*
+        a.wait(1000);
+        a.doClick("GO5BKVTBLLD-su-ivt-helios-web-ui-widgets-tree-customTree-BaseTreeResources-Style-arrow", 1);
+        a.wait(1000);
+        a.doClick("GO5BKVTBIMD-su-ivt-helios-web-ui-widgets-tree-customTree-BaseTreeResources-Style-text", 3);
+        a.wait(1000);
+        a.doClick("GO5BKVTBNED-su-ivt-helios-web-ui-widgets-heliosButton-HeliosButtonResources-HeliosButtonResourcesStyle-text", 2);
+        a.wait(1000);
+        a.doClick("GO5BKVTBNED-su-ivt-helios-web-ui-widgets-heliosButton-HeliosButtonResources-HeliosButtonResourcesStyle-text", 2);
+        a.wait(1000);
+        a.goTo("http://rc.helios2.ivt.lan/#workJournal");
+        a.wait(1000);
+        a.doClick("GO5BKVTBIMD-su-ivt-helios-web-ui-widgets-tree-customTree-BaseTreeResources-Style-text", 1);
+        if (a.checkBySelector("//div[@title='Опрос состояния']"))
+        System.out.println("Есть опросы!");*/
+        if (a.checkByClassname("GO5BKVTBLLD-su-ivt-helios-web-ui-widgets-tree-customTree-BaseTreeResources-Style-arrow"))
+            System.out.println("Error: Tree is empty");
+        else
+        System.out.println("Info: Test completed successfully");
+        a.wait(1000);
+        a.driver.quit();
+
+
+    }
+}
+

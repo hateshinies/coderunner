@@ -1,0 +1,72 @@
+package com.company.interfaces;
+
+
+public interface HashTable{
+
+        void put(Object key,Object value);
+
+        void remove(Object key);
+
+        Object get(Object key);
+        }
+------------------------------------------
+package com.company.classes;
+
+import com.company.interfaces.HashTable;
+
+import java.util.LinkedList;
+import java.util.List;
+
+public class ChainHTable implements HashTable {
+    private class Entry {
+        private Object key;
+        private Object value;
+
+        private Entry(Object key, Object value) {
+            this.key = key;
+            this.value = value;
+        }
+    }
+
+    private List<Entry> table[];
+
+    @SuppressWarnings("unchecked")
+    public ChainHTable() {
+        table = new LinkedList[10];
+        for (int i = 0; i < 10; i++) {
+            table[i] = new LinkedList<>();
+            
+        }
+    }
+
+    @Override
+    public void put(Object key, Object value) {
+        int index = key.hashCode() % table.length;
+        List<Entry> list = table[index];
+        list.add(new Entry(key, value));
+    }
+
+    @Override
+    public Object get(Object key) {
+        int index = key.hashCode() % table.length;
+        List list = table[index];
+        for (Object aList : list) {
+            Entry entry = (Entry) aList;
+            if (entry.key.equals(key)) return entry.value;
+        }
+        return null;
+    }
+
+    @Override
+    public void remove(Object key) {
+        int index = key.hashCode() % table.length;
+        List list = table[index];
+        for (Object aList : list) {
+            Entry entry = (Entry) aList;
+            if (entry.key.equals(key)) {
+                list.remove(entry);
+                return;
+            }
+        }
+    }
+}

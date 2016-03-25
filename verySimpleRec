@@ -1,0 +1,30 @@
+import java.util.Random;
+
+public class Main {
+
+    public static String recursion(int a, int b) {
+        if (a > b) {
+            if (a == b) {
+                return Integer.toString(a);
+            }
+            return a + " " + recursion(a - 1, b);
+        } else {
+            if (a == b) {
+                return Integer.toString(a);
+            }
+            return a + " " + recursion(a + 1, b);
+        }
+    }
+
+    static int randomize() {
+        return new Random().nextInt(15);
+    }
+
+    public static void main(String[] args) throws Exception {
+        int a = randomize();
+        int b = randomize();
+        if (a == b) throw new Exception("Error: a = b = " + a);
+        System.out.println("Heres the numbers between " + a + " and " + b);
+        System.out.println(recursion(a, b));
+    }
+}
